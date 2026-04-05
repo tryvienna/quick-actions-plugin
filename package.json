@@ -1,0 +1,29 @@
+{
+  "name": "plugin-quick-actions",
+  "version": "0.0.1",
+  "private": true,
+  "vienna-plugin": true,
+  "description": "Run pnpm scripts from the menu bar with one click",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format:check": "prettier --check .",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@tryvienna/sdk": "^0.1.6"
+  },
+  "devDependencies": {
+    "@tryvienna/ui": "^0.0.7",
+    "@types/node": "^25.3.2",
+    "@types/react": "^19.0.0",
+    "graphql": "^16.13.2",
+    "typescript": "^5.9.3"
+  }
+}
