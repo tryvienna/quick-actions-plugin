@@ -10,6 +10,7 @@ import type { MenuBarCanvasProps } from '@tryvienna/sdk';
 import { usePluginMutation, usePluginQuery, useActiveWorkstreamId } from '@tryvienna/sdk/react';
 import {
   useQuickActionsSettings,
+  useActiveProjectId,
   type QuickAction,
 } from './useQuickActionsSettings';
 import {
@@ -22,7 +23,8 @@ import {
 } from '../client/operations';
 
 export function QuickActionsMenuBarContent({ onClose, openPluginDrawer, logger }: MenuBarCanvasProps) {
-  const { actions } = useQuickActionsSettings();
+  const projectId = useActiveProjectId();
+  const { actions } = useQuickActionsSettings(projectId);
   const [runAction] = usePluginMutation<RunQuickActionData, RunQuickActionVars>(RUN_QUICK_ACTION);
   const activeWorkstreamId = useActiveWorkstreamId();
 

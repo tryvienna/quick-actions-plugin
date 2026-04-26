@@ -12,6 +12,7 @@ import type { PluginDrawerCanvasProps } from '@tryvienna/sdk';
 import { usePluginQuery } from '@tryvienna/sdk/react';
 import {
   useQuickActionsSettings,
+  useActiveProjectId,
   makeActionId,
 } from './useQuickActionsSettings';
 import {
@@ -23,22 +24,9 @@ import {
   type GetProjectDirsVars,
 } from '../client/operations';
 
-/** Hard-coded project ID — for now we use the first project. */
-function useProjectId(): string | null {
-  // The plugin doesn't have direct access to the app's active project state.
-  // We read it from localStorage where the app stores it.
-  try {
-    const raw = localStorage.getItem('vienna:activeProjectId');
-    if (!raw) return null;
-    return JSON.parse(raw) as string;
-  } catch {
-    return null;
-  }
-}
-
 export function QuickActionsDrawer(_props: PluginDrawerCanvasProps) {
-  const projectId = useProjectId();
-  const { actions, toggleAction, updateAction } = useQuickActionsSettings();
+  const projectId = useActiveProjectId();
+  const { actions, toggleAction, updateAction, resetActions } = useQuickActionsSettings(projectId);
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
@@ -94,6 +82,18 @@ export function QuickActionsDrawer(_props: PluginDrawerCanvasProps) {
       {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-3">
         <h2 className="text-sm font-semibold">Quick Actions</h2>
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-40 disabled:hover:text-muted-foreground disabled:cursor-not-allowed"
+          onClick={resetActions}
+          disabled={actions.length === 0}
+          title={actions.length === 0 ? 'No actions to reset' : `Clear all ${actions.length} quick action${actions.length === 1 ? '' : 's'} for this project`}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+          Reset
+        </button>
       </div>
 
       {/* Search */}
@@ -126,7 +126,11 @@ export function QuickActionsDrawer(_props: PluginDrawerCanvasProps) {
       {/* Script list */}
       <div className="flex-1 overflow-y-auto">
         <div className="p-4 space-y-4">
-          {loading ? (
+          {!projectId ? (
+            <p className="text-sm text-muted-foreground text-center py-8">
+              No project selected
+            </p>
+          ) : loading ? (
             <p className="text-sm text-muted-foreground text-center py-8">
               Discovering scripts...
             </p>
